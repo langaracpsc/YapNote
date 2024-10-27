@@ -1,19 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useVoiceRecorder } from './hooks/useVoiceRecorder';
+import useDiarization from './hooks/useDiarization';
 
 function App() {
   const [transcriptOutput, setTranscriptOutput] = useState<string>('');
+  const [diarizationResults, setDiarizationResults] = useState<any>(null);
 
-  const { isListening, transcript, error, startListening, stopListening } = useSpeechRecognition({ onResult: (result: string) => {
-    console.log(result);
-    setTranscriptOutput(transcriptOutput + result);
-  } });
+  const { isListening, transcript, error, startListening, stopListening } = useSpeechRecognition({
+    onResult: (result: string) => {
+      console.log(result);
+      setTranscriptOutput(transcriptOutput + result);
+    }
+  });
 
-  const { isRecording, audioURL, startRecording, stopRecording } = useVoiceRecorder();
+  const { isRecording, audioURL, audioBlob, startRecording, stopRecording } = useVoiceRecorder();
 
   if (error) {
     alert(error);
@@ -29,16 +31,81 @@ function App() {
     stopRecording();
   }
 
+  const { runDiarization, results } = useDiarization({ onResult: (result) => {
+    setDiarizationResults(result.utterances?.map((utterance: any) => {
+      return {
+        speaker: utterance.speaker,
+        text: utterance.text
+      }
+    }));
+  } });
+
+  useEffect(() => {
+    if (results) {
+      setDiarizationResults(results);
+    }
+  }, [results]);
+  
   return (
-    <>
-      <h1>YapNote</h1>
-      <div>
-        <button onClick={(isListening) ? stop  : start} className={`${isListening ? "bg-gray-500" : "bg-blue-500"} text-white p-2 rounded-md`}>{isListening ? 'Listening...' : 'Start Listening'}</button>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">YapNote</h1>
+      <div className="mb-4">
+        <button 
+          onClick={isListening ? stop : start} 
+          className={`${isListening ? "bg-red-500" : "bg-blue-500"} text-white py-2 px-4 rounded-md hover:opacity-90 transition-opacity`}
+        >
+          {isListening ? 'Stop Listening' : 'Start Listening'}
+        </button>
       </div>
-      <p>{transcript}</p>
-      {(!isRecording && audioURL) && <audio src={audioURL?.toString()} controls />}
-      {(!isRecording) && <a href={audioURL?.toString()} download>Download</a>}
-    </>
+      <p className="mb-4 p-2 bg-gray-100 rounded">{transcript}</p>
+      {(!isRecording && audioURL) && (
+        <div className="mb-4">
+          <audio src={audioURL?.toString()} controls className="w-full" />
+        </div>
+      )}
+      {(!isRecording && audioURL) && (
+        <a 
+          href={audioURL?.toString()} 
+          download 
+          className="inline-block mb-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors"
+        >
+          Download Audio
+        </a>
+      )}
+      {(!isRecording && audioBlob) && (
+        <button 
+          onClick={() => runDiarization(audioBlob, 'en')}
+          className="mb-4 bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 transition-colors"
+        >
+          Run Diarization
+        </button>
+      )}
+      <div className="mb-4">
+        <label htmlFor="audioUpload" className="block mb-2 font-semibold">Upload Audio File:</label>
+        <input 
+          id="audioUpload"
+          type="file" 
+          accept="audio/*" 
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              runDiarization(file, 'en');
+            }
+          }}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+      {diarizationResults && diarizationResults.utterances && (
+        <div className="bg-gray-100 p-4 rounded">
+          <h2 className="text-xl font-semibold mb-4">Diarization Results</h2>
+          {diarizationResults.map((utterance: any, index: number) => (
+            <p key={index} className="mb-2">
+              <strong className="text-blue-600">Speaker {utterance.speaker}:</strong> {utterance.text}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

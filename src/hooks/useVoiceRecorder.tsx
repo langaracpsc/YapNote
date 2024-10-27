@@ -32,5 +32,5 @@ export const useVoiceRecorder = () => {
         }
     }, [audioBlob]);      
 
-    return { isRecording, audioURL, startRecording, stopRecording };
+    return { isRecording, audioURL, audioBlob, startRecording, stopRecording };
 }       
