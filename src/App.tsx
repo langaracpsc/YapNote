@@ -3,6 +3,7 @@ import './App.css'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useVoiceRecorder } from './hooks/useVoiceRecorder';
 import useDiarization from './hooks/useDiarization';
+import Results from './components/Results';
 
 function App() {
   const [transcriptOutput, setTranscriptOutput] = useState<string>('');
@@ -98,17 +99,9 @@ function App() {
           className="w-full p-2 border border-gray-300 rounded"
         />
       </div>
-      {diarizationResults && diarizationResults.length > 0 && (
-        <div className="bg-gray-100 p-4 rounded">
-          <h2 className="text-xl font-semibold mb-4">Diarization Results</h2>
-          {diarizationResults?.map((utterance: any, index: number) => (
-            <p key={index} className="mb-2">
-              <strong className="text-blue-600">Speaker {utterance.speaker}:</strong> {utterance.text}
-            </p>
-          ))}
-        </div>
-      )}
+      <Results results={diarizationResults} />
     </div>
+
   )
 }
 
