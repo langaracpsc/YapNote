@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/hooks/usediarization.tsx","./src/hooks/usespeechrecognition.tsx","./src/hooks/usevoicerecorder.tsx","./src/lib/utils.ts"],"version":"5.6.3"}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const useSpeechRecognition = ({ onResult }: { onResult: (transcript: string) => void | undefined }) => {
     const [isListening, setIsListening] = useState(false);
@@ -11,8 +11,8 @@ export const useSpeechRecognition = ({ onResult }: { onResult: (transcript: stri
     speechRecognition.continuous = true;
     speechRecognition.interimResults = true;
     speechRecognition.maxAlternatives = 1;
-
-    speechRecognition.onresult = (event: SpeechRecognitionEvent) => {
+ 
+    speechRecognition.onresult = (event: any) => {
         const results = Array.from(event.results);
         const latestResult: any = results[results.length - 1];
         const transcript = latestResult[0].transcript;
@@ -24,18 +24,18 @@ export const useSpeechRecognition = ({ onResult }: { onResult: (transcript: stri
         }
     };
 
-    speechRecognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    speechRecognition.onerror = (event: any) => {
         setError(event.error);
     };
 
     const startListening = () => {
-        setIsListening(true);
         speechRecognition.start();
+        setIsListening(true);
     };
 
     const stopListening = () => {
-        setIsListening(false);
         speechRecognition.stop();
+        setIsListening(false);
     };
 
     return { isListening, transcript, error, startListening, stopListening };

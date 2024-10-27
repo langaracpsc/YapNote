@@ -8,10 +8,11 @@ export default function useDiarization({ onResult }: { onResult: (result: Transc
     });
 
     const [results, setResults] = useState<Transcript | null>(null);
+    
+    const [status, setStatus] = useState<string | null>("idle");
 
-    const runDiarization = async (audio: Blob, language: string) => {
-        console.log('Starting diarization with audio type:', audio.type);
-        console.log('Language:', language);
+    const runDiarization = async (audio: Blob) => {
+        setStatus("diarizing");
 
         const params: TranscribeParams = {  
             audio: new File([audio], 'audio.wav', { type: audio.type }),
@@ -25,13 +26,18 @@ export default function useDiarization({ onResult }: { onResult: (result: Transc
             console.log('Transcription completed:', transcript);
             setResults(transcript);
             onResult(transcript);
+            
+            setStatus("done");
         } catch (error) {
             console.error('Transcription error:', error);
+        } finally {
+            setStatus("idle");
         }
     };
 
     return {
         runDiarization,
-        results
+        results,
+        status
     };
 }
