@@ -51,10 +51,14 @@ function App() {
           onClick={isListening ? stop : start}
           className={`${isListening ? "bg-red-500" : "bg-blue-500"} text-white py-2 px-4 rounded-md hover:opacity-90 transition-opacity`}
         >
-          {isListening ? 'Stop Listening' : 'Start Listening'}
+          {isListening ? 'Stop' : 'Start'}
         </button>
       </div>
-      <p className="mb-4 p-2 bg-gray-100 rounded">{transcript}</p>
+      {
+        transcript && (
+          <p className="mb-4 p-2 bg-gray-100 rounded">{transcript}</p>
+        )
+      }
       {(!isRecording && audioURL) && (
         <div className="mb-4">
           <audio src={audioURL?.toString()} controls className="w-full" />
@@ -84,25 +88,25 @@ function App() {
           )
         }
       </div>
-      <div className="mb-4">
-        <label htmlFor="audioUpload" className="block mb-2 font-semibold">Upload Audio File:</label>
-        <input
-          id="audioUpload"
-          type="file"
-          accept="audio/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              runDiarization(file);
-            }
-          }}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
+      {
+        (!isRecording && !audioBlob) &&
+        (<div className="mb-4">
+          <label htmlFor="audioUpload" className="block mb-2 font-semibold">Upload Audio File:</label>
+          <input
+            id="audioUpload"
+            type="file"
+            accept="audio/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                runDiarization(file);
+              }
+            }}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>)}
       <Results results={diarizationResults} />
     </div>
-
   )
 }
-
 export default App
