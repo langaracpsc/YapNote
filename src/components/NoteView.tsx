@@ -64,15 +64,18 @@ export default function NoteView() {
     return (<>
         <Card className="flex flex-col h-[calc(100vh-20rem)] w-[calc(80vw)]">
             <CardHeader>
-                <div className="flex flex-row justify-between">
-                    <CardTitle>Notes</CardTitle>
-                    <Button variant="outline" size="icon" onClick={() => {
-                        const newNote = createNote();
-                        setNotes([...notes, newNote]);
-                        note.current = newNote;
-                    }}>
-                        <PlusIcon />
-                    </Button>
+                <div className="grid grid-cols-2 items-center">
+                    <div className="flex flex-row items-center justify-between">
+                        <CardTitle>Notes</CardTitle>
+
+                        {notes.length >= 1 && <Button variant="outline" size="icon" onClick={() => {
+                            const newNote = createNote();
+                            setNotes([...notes, newNote]);
+                            note.current = newNote;
+                        }} className="mr-5">
+                                <PlusIcon />
+                            </Button>}
+                    </div>
                 </div>
 
             </CardHeader>
