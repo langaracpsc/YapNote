@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Dark Base Y Shape with Shadow -->
+  <path d="M120 80 L200 180 L280 80" 
+        stroke="#1a1a1a" 
+        stroke-width="44" 
+        stroke-linecap="round"
+        fill="none"/>
+  
+  <path d="M200 170 L200 280" 
+        stroke="#1a1a1a" 
+        stroke-width="44" 
+        stroke-linecap="round"
+        fill="none"/>
+  
+  <!-- Main Y Shape -->
+  <path d="M120 80 L200 180 L280 80" 
+        stroke="#333333" 
+        stroke-width="40" 
+        stroke-linecap="round"
+        fill="none"/>
+  
+  <path d="M200 170 L200 280" 
+        stroke="#333333" 
+        stroke-width="40" 
+        stroke-linecap="round"
+        fill="none"/>
+  
+  <!-- Pen/Pencil -->
+  <g transform="translate(200,130) rotate(45)">
+    <!-- Pen Body -->
+    <rect x="-10" y="-60" width="20" height="120" rx="5" fill="#666666"/>
+    
+    <!-- Pen Tip -->
+    <path d="M-10 -60 L0 -75 L10 -60 Z" fill="#808080"/>
+    
+    <!-- Pen Rings -->
+    <rect x="-12" y="-40" width="24" height="5" rx="2" fill="#999999"/>
+    <rect x="-12" y="-30" width="24" height="5" rx="2" fill="#999999"/>
+  </g>
+</svg>
