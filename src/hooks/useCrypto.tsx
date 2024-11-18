@@ -1,6 +1,6 @@
 export default function useCrypto() {
-    let crypto;
-
+    let crypto;    
+    
     if (typeof window !== "undefined") {
         crypto = window.crypto;
     } else {

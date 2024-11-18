@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import useDiarization from '@/hooks/useDiarization';

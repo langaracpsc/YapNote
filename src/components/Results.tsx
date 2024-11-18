@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 
 export default function Results({ results, id }: { results: any[], id: string }) {
-    const [, setUpdateTrigger] = useState({});
-
     const createBlobUrl = (text: string) => {
         return URL.createObjectURL(new Blob([text], { type: 'application/json' }));
     }
@@ -13,6 +11,22 @@ export default function Results({ results, id }: { results: any[], id: string })
     useEffect(() => {
         setBlobUrl(createBlobUrl(JSON.stringify(results)));
     }, [results]);
+
+
+    const saveSpeakerLabel = (utterance: any, label: string | null) => {
+        if (!label || label === '') {
+            alert('Enter a valid label');
+            return;
+        }
+
+        results.forEach((result, i) => {
+            if (result.speaker === utterance.speaker) {
+                results[i] = { ...result, speaker: label.trimStart().trimEnd() };
+            }
+        });
+
+        setBlobUrl(createBlobUrl(JSON.stringify(results)));
+    }
 
     const ResultEntry = ({ utterance }: { utterance: any }) => {
         const labelRef = useRef<HTMLInputElement>(null);
@@ -32,6 +46,11 @@ export default function Results({ results, id }: { results: any[], id: string })
                         onChange={(e) => {
                             setChanged(e.target.value !== defaultValue);
                         }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                saveSpeakerLabel(utterance, labelRef.current?.value || 'Unknown');
+                            }
+                        }}
                     />
                     <span>:</span>
                     <span>{utterance.text}</span>
@@ -39,13 +58,7 @@ export default function Results({ results, id }: { results: any[], id: string })
                 {(changed && <Button
                     className="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
                     onClick={() => {
-                        results.forEach((result, i) => {
-                            if (result.speaker === utterance.speaker) {
-                                results[i] = { ...result, speaker: labelRef.current?.value };
-                            }
-                        });
-
-                        setBlobUrl(createBlobUrl(JSON.stringify(results)));
+                        saveSpeakerLabel(utterance, labelRef.current?.value || null);
                     }}
                 >
                     Save
