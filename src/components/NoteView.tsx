@@ -83,15 +83,12 @@ export default function NoteView() {
                 <div className="col-span-1 flex flex-col gap-[0.25rem] items-start border-r pr-4 overflow-y-auto">
                     {(notes.length < 1) && <Button variant="outline" size="icon" className="w-[calc(100%-4rem)]" onClick={() => {
                         const newNote = createNote();
-                        setNotes([...notes, newNote]);
+                        setNotes([newNote, ...notes]);
                         note.current = newNote;
                     }}>
                         <PlusIcon />New Note
                     </Button>}
-                    {notes?.map((n) => <NoteEntry id={n.id} onClick={() => {
-                        note.current = n;
-                        updateNote();
-                    }} />)}
+                    {notes?.map((n) => <NoteEntry id={n.id}/>)}
                 </div>
                 {currentNote.current.id != '' && <div className="col-span-1 flex flex-col gap-4 pl-4">
                     <Note noteRef={currentNote} onResult={updateNote} />

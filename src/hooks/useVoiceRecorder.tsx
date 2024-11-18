@@ -27,8 +27,12 @@ export const useVoiceRecorder = () => {
     }
 
     useEffect(() => {
+        const audioBlobCopy: Blob | null = audioBlob;
+
         if (audioBlob) {
             setAudioURL(URL.createObjectURL(audioBlob));
+            
+            setAudioBlob(audioBlobCopy);
         }
     }, [audioBlob]);      
 
