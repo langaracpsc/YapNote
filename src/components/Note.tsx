@@ -8,6 +8,7 @@ export interface NoteModel {
     id: string;
     transcript: string;
     diarizationResults: any[];
+    createdAt: Date | null;
 }
 
 export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<NoteModel>, onResult?: (note: NoteModel) => void }) {
@@ -52,7 +53,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
 
         noteRef.current.transcript = transcriptOutput;
     }
-    
+
     useEffect(() => {
         setLocalAudioBlob(audioBlob);
     }, [audioBlob]);
@@ -75,7 +76,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
     return (
         <div className="flex flex-col w-full h-full gap-3">
             <div className="flex flex-col gap-4 items-center">
-                <span className="text-sm font-medium text-gray-600">Note {noteRef.current.id.split('-')[0]}</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Note {noteRef.current.id.split('-')[0]}</span>
             </div>
             <div className="mb-4">
                 <button
@@ -86,7 +87,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
                 </button>
             </div>
             {transcript && (
-                <p className="mb-4 p-2 bg-gray-100 rounded">{transcript}</p>
+                <p className="mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded dark:text-gray-200">{transcript}</p>
             )}
             {(!isRecording && audioURL) && (
                 <div className="mb-4">
@@ -98,7 +99,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
                     <a
                         href={audioURL}
                         download
-                        className="inline-block mb-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors"
+                        className="inline-block mb-4 bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700"
                     >
                         Download Audio
                     </a>
@@ -106,18 +107,18 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
                 {(!isRecording && localAudioBlob && diarizationStatus === "idle") && (
                     <button
                         onClick={() => runDiarization(localAudioBlob)}
-                        className="mb-4 bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 transition-colors"
+                        className="mb-4 bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700"
                     >
                         Run Diarization
                     </button>
                 )}
                 {(!isRecording && localAudioBlob && diarizationStatus === "diarizing") && (
-                    <p>Diarizing...</p>
+                    <p className="dark:text-gray-200">Diarizing...</p>
                 )}
             </div>
             {(!isRecording && !localAudioBlob) && (
                 <div className="mb-4">
-                    <label htmlFor="audioUpload" className="block mb-2 font-semibold">Upload Audio File:</label>
+                    <label htmlFor="audioUpload" className="block mb-2 font-semibold dark:text-gray-200">Upload Audio File:</label>
                     <input
                         id="audioUpload"
                         type="file"
@@ -129,12 +130,12 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
                                 runDiarization(file);
                             }
                         }}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded dark:bg-gray-800 dark:text-gray-200"
                     />
                 </div>
             )}
             {diarizationStatus === "diarizing" && fileRef.current?.files?.length && <p>Diarizing...</p>}
-            {!isRecording && <Results results={diarizationResults} id={noteRef.current.id} />}
+            {!isRecording && <Results results={diarizationResults} id={noteRef.current.id} note={noteRef.current} />}
         </div>
     )
 }
