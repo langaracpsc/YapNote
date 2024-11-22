@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from './ui/button'
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog'
 import { AlertDialogAction, AlertDialogCancel } from '@radix-ui/react-alert-dialog'
+import { useLLM } from '@/hooks/useLLM'
 
-export default function Chat( { noteId, results, show }: { noteId: string, results: any[]  , show: boolean }) {
+export default function Chat({ noteId, results, show }: { noteId: string, results: any[], show: boolean }) {
     const [messages, setMessages] = useState<{ role: string, content: string }[]>([])
     const [input, setInput] = useState('')
     const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -11,6 +12,31 @@ export default function Chat( { noteId, results, show }: { noteId: string, resul
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+   
+    const { initChat, sendMessage } = useLLM({
+        noteResults: results,
+        onMessage: (content: string) => {
+            setMessages(prev => {
+                // If this is a new message, add it as a new message
+                if (prev.length === 0 || prev[prev.length - 1].role !== 'assistant') {
+                    return [...prev, {
+                        role: 'assistant',
+                        content
+                    }]
+                }
+                // Otherwise update the last message
+                return prev.map((msg, i) => {
+                    if (i === prev.length - 1) {
+                        return {
+                            ...msg,
+                            content: msg.content + content
+                        }
+                    }
+                    return msg
+                })
+            })
+        }
+    })
 
     useEffect(() => {
         scrollToBottom()
@@ -27,15 +53,12 @@ export default function Chat( { noteId, results, show }: { noteId: string, resul
         }])
         setInput('')
 
-        // TODO: Add API call here
-        // For now just echo back
-        setTimeout(() => {
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: `You said: ${input}`
-            }])
-        }, 100)
+        await sendMessage(input);
     }
+
+    useEffect(() => {
+        initChat(noteId);
+    }, [noteId])
 
     return (
         show &&
@@ -54,8 +77,8 @@ export default function Chat( { noteId, results, show }: { noteId: string, resul
                                     >
                                         <div
                                             className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === 'user'
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-200'
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-200'
                                                 }`}
                                         >
                                             {message.content}

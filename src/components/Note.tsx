@@ -17,7 +17,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
 
     useEffect(() => {
         // Reset state when noteRef changes
-        setTranscriptOutput(''); // Reset transcript for new note
+        setTranscriptOutput(''); // Reset cript for new note
         setDiarizationResults(noteRef.current.diarizationResults);
         if (fileRef.current) {
             fileRef.current.value = '';

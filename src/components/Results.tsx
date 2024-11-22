@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import Chat from "./Chat";
 import { NoteModel } from "./Note";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { AlertDialogAction, AlertDialogCancel } from '@radix-ui/react-alert-dialog';
 
 export default function Results({ results, id, note }: { results: any[], id: string, note: NoteModel }) {
     const createBlobUrl = (text: string) => {
@@ -31,6 +33,7 @@ export default function Results({ results, id, note }: { results: any[], id: str
     }
 
     const [showChat, setShowChat] = useState(true);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const ResultEntry = ({ utterance }: { utterance: any }) => {
         const labelRef = useRef<HTMLInputElement>(null);
@@ -86,9 +89,32 @@ export default function Results({ results, id, note }: { results: any[], id: str
                                 Download JSON
                             </a>
                         )}
-                        <Chat noteId={id} results={results} show={showChat} />
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline">View JSON</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Conversation JSON</AlertDialogTitle>
+                                    <AlertDialogDescription className="h-full">
+                                        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-auto max-h-[70vh] w-full">
+                                            {JSON.stringify(results, null, 2)}
+                                        </pre>
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Close</AlertDialogCancel>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <AlertDialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline">Open Chat</Button>
+                            </AlertDialogTrigger>
+                            <Chat noteId={id} results={results} show={showChat} />
+                        </AlertDialog>
                     </div>
-                    <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-y-auto max-h-96 gap-3">
+                    <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-y-auto max-h-[70vh] w-full gap-3">
                         {results.map((utterance: any, index: number) => (
                             <ResultEntry key={index} utterance={utterance} />
                         ))}
