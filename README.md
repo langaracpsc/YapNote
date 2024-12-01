@@ -1,3 +1,5 @@
+
+![alt text](public/logo.svg) 
 # YapNote
 
 YapNote is a voice-powered note-taking app designed for efficient meeting documentation.
@@ -9,7 +11,7 @@ YapNote is a voice-powered note-taking app designed for efficient meeting docume
 - Edit and refine transcribed notes
 - Categorize notes by meeting type or project
 - Share meeting summaries with team members
-
+u
 ## Getting Started
 
 ### Prerequisites
@@ -19,7 +21,7 @@ YapNote is a voice-powered note-taking app designed for efficient meeting docume
 ### Installation
 1. Clone the repository
 ```
-git clone https://github.com/yourusername/yapnote.git
+git clone https://github.com/rishit-singh/yapnote.git
 ```
 
 2. Install dependencies
