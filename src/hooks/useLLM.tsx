@@ -2,7 +2,7 @@ import Groq from "groq-sdk";
 import { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions.mjs";
 import { useState } from "react";
 
-export const useLLM = ({ noteResults, onMessage }: { noteResults: any[], onMessage: (message: string) => void }) => {
+export const useLLM = ({ model, noteResults, onMessage }: { model: string, noteResults: any[], onMessage: (message: string) => void }) => {
     const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
     // Move messageHistory inside useState to persist between renders
     const [messageHistory, setMessageHistory] = useState<{ role: "system" | "user" | "assistant", content: string }[]>([]);
@@ -28,7 +28,7 @@ export const useLLM = ({ noteResults, onMessage }: { noteResults: any[], onMessa
 
                 const chatCompletion = await groq.chat.completions.create({
                     messages: initialMessages,
-                    model: "llama3-8b-8192",
+                    model: model,
                     temperature: 0.5,
                     max_tokens: 1024,
                     top_p: 1,
@@ -74,7 +74,7 @@ export const useLLM = ({ noteResults, onMessage }: { noteResults: any[], onMessa
 
                 const chatCompletion = await groq.chat.completions.create({
                     messages: currentHistory as ChatCompletionMessageParam[],
-                    model: "llama3-8b-8192",
+                    model: model,
                     temperature: 0.5,
                     max_tokens: 1024,
                     top_p: 1,

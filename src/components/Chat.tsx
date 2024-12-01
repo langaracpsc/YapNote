@@ -13,7 +13,9 @@ export default function Chat({ noteId, results, show }: { noteId: string, result
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
    
-    const { initChat, sendMessage } = useLLM({
+    const { initChat, sendMessage }
+     = useLLM({
+        model: "llama3-8b-8192",
         noteResults: results,
         onMessage: (content: string) => {
             setMessages(prev => {

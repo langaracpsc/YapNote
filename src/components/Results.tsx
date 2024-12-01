@@ -80,26 +80,30 @@ export default function Results({ results, id, note }: { results: any[], id: str
                 <div className="flex flex-col gap-3 items-center">
                     <div className="flex flex-row gap-3 items-center">
                         <h2 className="text-xl font-semibold dark:text-gray-200">Diarization Results</h2>
-                        {blobUrl && (
-                            <a
-                                href={blobUrl}
-                                download={`note-${id.split('-')[0]}-${Date.now()}.json`}
-                                className="bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                Download JSON
-                            </a>
-                        )}
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="outline">View JSON</Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full">
+                            <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full overflow-x-scroll">
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>Conversation JSON</AlertDialogTitle>
+                                    <AlertDialogTitle className="flex flex-row gap-2 items-center overflow-hidden text-ellipsis whitespace-nowrap">
+                                        Conversation JSON
+                                        {blobUrl && (
+                                            <a
+                                                href={blobUrl}
+                                                download={`note-${id.split('-')[0]}-${Date.now()}.json`}
+                                                className="bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors overflow-hidden text-ellipsis whitespace-nowrap"
+                                            >
+                                                Download JSON
+                                            </a>
+                                        )}
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription className="h-full">
-                                        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-auto max-h-[70vh] w-full">
-                                            {JSON.stringify(results, null, 2)}
-                                        </pre>
+                                        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-x-scroll overflow-y-auto max-h-[70vh] w-full">
+                                            <pre>
+                                                {JSON.stringify(results, null, 2)}
+                                            </pre>
+                                        </div>
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -107,12 +111,7 @@ export default function Results({ results, id, note }: { results: any[], id: str
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                        <AlertDialog open={isChatOpen} onOpenChange={setIsChatOpen}>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="outline">Open Chat</Button>
-                            </AlertDialogTrigger>
-                            <Chat noteId={id} results={results} show={showChat} />
-                        </AlertDialog>
+                        <Chat noteId={id} results={results} show={showChat} />
                     </div>
                     <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-y-auto max-h-[70vh] w-full gap-3">
                         {results.map((utterance: any, index: number) => (

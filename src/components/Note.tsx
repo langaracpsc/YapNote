@@ -3,12 +3,18 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import useDiarization from '@/hooks/useDiarization';
 import Results from '@/components/Results';
-
+    
+export interface Audio {
+    blob: Blob | null;
+    url: string | null;
+}
 export interface NoteModel {
     id: string;
     transcript: string;
     diarizationResults: any[];
     createdAt: Date | null;
+    audio: Blob | null;
+    url: string | null;
 }
 
 export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<NoteModel>, onResult?: (note: NoteModel) => void }) {
@@ -52,10 +58,15 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
         stopRecording();
 
         noteRef.current.transcript = transcriptOutput;
+        noteRef.current.audio = audioBlob; 
+        noteRef.current.url = audioURL;
     }
 
     useEffect(() => {
-        setLocalAudioBlob(audioBlob);
+        if (audioBlob != noteRef.current.audio) {
+            setLocalAudioBlob(audioBlob);
+            noteRef.current.audio = audioBlob;
+        }
     }, [audioBlob]);
 
     const { runDiarization, status: diarizationStatus } = useDiarization({
@@ -67,6 +78,7 @@ export function Note({ noteRef, onResult }: { noteRef: React.MutableRefObject<No
 
             setDiarizationResults(processedResults);
             noteRef.current.diarizationResults = processedResults;
+            
             onResult?.(noteRef.current);
         }
     });
