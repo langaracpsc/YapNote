@@ -14,7 +14,6 @@ YapNote is a voice-powered note-taking app designed for efficient meeting docume
 
 ### Prerequisites
 - Node.js v16 or higher
-- MongoDB
 - Modern web browser with microphone support
 
 ### Installation
