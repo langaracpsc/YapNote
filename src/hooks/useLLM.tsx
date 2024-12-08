@@ -8,7 +8,7 @@ export const useLLM = ({ model, noteResults, onMessage }: { model: string, noteR
     const [messageHistory, setMessageHistory] = useState<{ role: "system" | "user" | "assistant", content: string }[]>([]);
 
     return {
-        initChat: async (noteId: string) => {
+        initChat: async () => {
             try {
                 // Reset history on init
                 const initialMessages = [

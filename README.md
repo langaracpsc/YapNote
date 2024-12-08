@@ -1,7 +1,13 @@
-<div style="display: flex; align-items: center; gap: 1rem;">
-  <img src="public/logo.svg" alt="YapNote Logo" width="80">
-  <h1>YapNote</h1>
-</div>
+<table>
+  <tr>
+    <td>
+      <img src="public/logo.svg" alt="YapNote Logo" width="80">
+    </td>
+    <td style="vertical-align: middle; padding-left: 1rem;">
+      <h1 style="margin: 0;">YapNote</h1>
+    </td>
+  </tr>
+</table>
 
 YapNote is a voice-powered note-taking app designed for efficient meeting documentation.
 

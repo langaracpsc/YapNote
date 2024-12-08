@@ -5,9 +5,15 @@ import { ThemeProvider } from './components/theme-provider';
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="flex flex-col items-center justify-start min-h-screen dark:bg-slate-950">
-        <h1 className="text-3xl font-bold mb-6 font-mono dark:text-white">YapNote</h1>
-        <NoteView />
+      <div className="flex h-screen bg-background">
+        <div className="flex flex-col w-full">
+          <header className="h-14 flex items-center px-6 border-b border-border">
+            <h1 className="text-xl font-semibold text-foreground">YapNote</h1>
+          </header>
+          <main className="flex-1">
+            <NoteView />
+          </main>
+        </div>
       </div>
     </ThemeProvider>
   );

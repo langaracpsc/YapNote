@@ -1,21 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
-import Chat from "./Chat";
 import { NoteModel } from "./Note";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
-import { AlertDialogAction, AlertDialogCancel } from '@radix-ui/react-alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { AlertDialogCancel } from '@radix-ui/react-alert-dialog';
+import { ListPlus, Pencil, X } from "lucide-react";
 
-export default function Results({ results, id, note }: { results: any[], id: string, note: NoteModel }) {
+export default function Results({ results, id, note, onUpdate }: { results: any[], id: string, note: NoteModel, onUpdate?: (note: NoteModel) => void }) {
     const createBlobUrl = (text: string) => {
         return URL.createObjectURL(new Blob([text], { type: 'application/json' }));
     }
 
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
+    const [localResults, setLocalResults] = useState(results);
 
     useEffect(() => {
-        setBlobUrl(createBlobUrl(JSON.stringify(results)));
+        setLocalResults(results);
     }, [results]);
 
+    useEffect(() => {
+        setBlobUrl(createBlobUrl(JSON.stringify(localResults)));
+    }, [localResults]);
 
     const saveSpeakerLabel = (utterance: any, label: string | null) => {
         if (!label || label === '') {
@@ -23,103 +27,142 @@ export default function Results({ results, id, note }: { results: any[], id: str
             return;
         }
 
-        results.forEach((result, i) => {
+        const updatedResults = localResults.map(result => {
             if (result.speaker === utterance.speaker) {
-                results[i] = { ...result, speaker: label.trimStart().trimEnd() };
+                return { ...result, speaker: label.trimStart().trimEnd() };
             }
+            return result;
         });
 
-        setBlobUrl(createBlobUrl(JSON.stringify(results)));
+        // Update local state
+        setLocalResults(updatedResults);
+
+        // Update the note's results
+        note.diarizationResults = updatedResults;
+        
+        // Update blob URL for download
+        setBlobUrl(createBlobUrl(JSON.stringify(updatedResults)));
+
+        // Notify parent of update
+        onUpdate?.(note);
     }
 
-    const [showChat, setShowChat] = useState(true);
     const [isChatOpen, setIsChatOpen] = useState(false);
 
     const ResultEntry = ({ utterance }: { utterance: any }) => {
         const labelRef = useRef<HTMLInputElement>(null);
-
         const defaultValue = utterance.speaker;
-
+        const [isEditing, setIsEditing] = useState(false);
         const [changed, setChanged] = useState(false);
 
-        return (<div className="flex flex-row gap-2">
-            <div className="flex-1 flex gap-2 items-center bg-gray-200 dark:bg-gray-700 p-2 rounded">
-                <div className="flex-1 flex gap-2 items-center">
-                    <input
-                        ref={labelRef}
-                        type="text"
-                        defaultValue={defaultValue}
-                        className="w-24 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 font-bold dark:text-gray-200"
-                        onChange={(e) => {
-                            setChanged(e.target.value !== defaultValue);
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                saveSpeakerLabel(utterance, labelRef.current?.value || 'Unknown');
-                            }
-                        }}
-                    />
-                    <span className="dark:text-gray-200">:</span>
-                    <span className="dark:text-gray-200">{utterance.text}</span>
+        const handleSave = () => {
+            saveSpeakerLabel(utterance, labelRef.current?.value || null);
+            setIsEditing(false);
+            setChanged(false);
+        };
+
+        return (
+            <div className="flex flex-row gap-2 group">
+                <div className="flex-1 flex gap-2 items-center bg-card p-3 rounded-lg border-2 border-border shadow-sm">
+                    <div className="flex-1 flex gap-3 items-center">
+                        <div 
+                            className="relative flex items-center min-w-[120px] cursor-pointer group/label"
+                            onClick={() => !isEditing && setIsEditing(true)}
+                        >
+                            {isEditing ? (
+                                <input
+                                    ref={labelRef}
+                                    type="text"
+                                    defaultValue={defaultValue}
+                                    className="w-full bg-background focus:outline-none focus:ring-2 focus:ring-primary rounded px-3 py-1.5 font-medium text-foreground border border-input"
+                                    onChange={(e) => {
+                                        setChanged(e.target.value !== defaultValue);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && changed) {
+                                            handleSave();
+                                        } else if (e.key === 'Escape') {
+                                            setIsEditing(false);
+                                            setChanged(false);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        if (!changed) {
+                                            setIsEditing(false);
+                                        }
+                                    }}
+                                    autoFocus
+                                />
+                            ) : (
+                                <>
+                                    <span className="font-medium text-foreground px-3 py-1.5">{utterance.speaker}</span>
+                                    <Pencil className="h-3.5 w-3.5 text-white opacity-0 group-hover/label:opacity-100 absolute right-2" />
+                                </>
+                            )}
+                        </div>
+                        <span className="text-foreground/80">:</span>
+                        <span className="text-foreground flex-1">{utterance.text}</span>
+                    </div>
+                    {(isEditing && changed) && (
+                        <Button
+                            className="px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md"
+                            onClick={handleSave}
+                        >
+                            Save
+                        </Button>
+                    )}
                 </div>
-                {(changed && <Button
-                    className="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                    onClick={() => {
-                        saveSpeakerLabel(utterance, labelRef.current?.value || null);
-                    }}
-                >
-                    Save
-                </Button>)}
             </div>
-        </div>);
+        );
     }
 
-    return (<div>
-        {results && results.length > 0 && (
-            <>
-                <div className="flex flex-col gap-3 items-center">
-                    <div className="flex flex-row gap-3 items-center">
-                        <h2 className="text-xl font-semibold dark:text-gray-200">Diarization Results</h2>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="outline">View JSON</Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full overflow-x-scroll">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="flex flex-row gap-2 items-center overflow-hidden text-ellipsis whitespace-nowrap">
-                                        Conversation JSON
-                                        {blobUrl && (
-                                            <a
-                                                href={blobUrl}
-                                                download={`note-${id.split('-')[0]}-${Date.now()}.json`}
-                                                className="bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors overflow-hidden text-ellipsis whitespace-nowrap"
-                                            >
-                                                Download JSON
-                                            </a>
-                                        )}
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="h-full">
-                                        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-x-scroll overflow-y-auto max-h-[70vh] w-full">
-                                            <pre>
-                                                {JSON.stringify(results, null, 2)}
-                                            </pre>
-                                        </div>
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Close</AlertDialogCancel>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                        <Chat noteId={id} results={results} show={showChat} />
+    return (
+        <>
+            <Button 
+                onClick={() => setIsChatOpen(true)} 
+                variant="outline"
+                className="border-border hover:bg-accent flex gap-2 items-center"
+            >
+                <ListPlus className="h-4 w-4 text-white" />
+                Show Results
+            </Button>
+
+            <AlertDialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+                <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full overflow-hidden flex flex-col bg-background border-2 border-border shadow-lg">
+                    <AlertDialogHeader className="border-b-2 border-border pb-4">
+                        <AlertDialogTitle className="flex items-center justify-between">
+                            <span className="text-lg font-semibold">Diarization Results</span>
+                            <div className="flex items-center gap-2">
+                                {blobUrl && (
+                                    <Button 
+                                        variant="secondary" 
+                                        asChild
+                                        className="ml-2 shadow-sm"
+                                    >
+                                        <a
+                                            href={blobUrl}
+                                            download={`note-${id.split('-')[0]}-${Date.now()}.json`}
+                                        >
+                                            Download JSON
+                                        </a>
+                                    </Button>
+                                )}
+                                <AlertDialogCancel className="h-8 w-8 p-0 rounded-full flex items-center justify-center hover:bg-accent">
+                                    <X className="h-4 w-4 text-white" />
+                                </AlertDialogCancel>
+                            </div>
+                        </AlertDialogTitle>
+                    </AlertDialogHeader>
+
+                    <div className="flex-1 overflow-y-auto mt-4 px-4">
+                        <div className="space-y-4">
+                            {localResults.map((utterance, index) => (
+                                <ResultEntry key={index} utterance={utterance} />
+                            ))}
+                        </div>
                     </div>
-                    <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-y-auto max-h-[70vh] w-full gap-3">
-                        {results.map((utterance: any, index: number) => (
-                            <ResultEntry key={index} utterance={utterance} />
-                        ))}
-                    </div>
-                </div>
-            </>
-        )}
-    </div>);
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    );
 } 
