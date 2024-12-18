@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
+import Chat from "./Chat";
 import { NoteModel } from "./Note";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog';
-import { ListPlus, Pencil, X } from "lucide-react";
+import { ListPlus, MessageSquare, Pencil, X } from "lucide-react";
 
 export default function Results({ results, id, note, onUpdate }: { results: any[], id: string, note: NoteModel, onUpdate?: (note: NoteModel) => void }) {
     const createBlobUrl = (text: string) => {
@@ -54,7 +55,7 @@ export default function Results({ results, id, note, onUpdate }: { results: any[
         const defaultValue = utterance.speaker;
         const [isEditing, setIsEditing] = useState(false);
         const [changed, setChanged] = useState(false);
-
+        
         const handleSave = () => {
             saveSpeakerLabel(utterance, labelRef.current?.value || null);
             setIsEditing(false);
@@ -118,14 +119,18 @@ export default function Results({ results, id, note, onUpdate }: { results: any[
 
     return (
         <>
-            <Button 
-                onClick={() => setIsChatOpen(true)} 
-                variant="outline"
-                className="border-border hover:bg-accent flex gap-2 items-center"
-            >
-                <ListPlus className="h-4 w-4 text-white" />
-                Show Results
-            </Button>
+            <div className="flex gap-2">
+                <Button 
+                    onClick={() => setIsChatOpen(true)} 
+                    variant="outline"
+                    className="border-border hover:bg-accent flex gap-2 items-center"
+                >
+                    <ListPlus className="h-4 w-4 text-white" />
+                    Show Results
+                </Button>
+
+                <Chat noteId={id} results={localResults} show={true} />
+            </div>
 
             <AlertDialog open={isChatOpen} onOpenChange={setIsChatOpen}>
                 <AlertDialogContent className="max-w-[90vw] max-h-[90vh] w-full overflow-hidden flex flex-col bg-background border-2 border-border shadow-lg">

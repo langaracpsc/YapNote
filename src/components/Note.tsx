@@ -9,6 +9,7 @@ export interface Audio {
     blob: Blob | null;
     url: string | null;
 }
+
 export interface NoteModel {
     id: string;
     transcript: string;

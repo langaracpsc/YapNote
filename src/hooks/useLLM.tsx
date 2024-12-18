@@ -14,11 +14,11 @@ export const useLLM = ({ model, noteResults, onMessage }: { model: string, noteR
                 const initialMessages = [
                     {
                         role: "system" as const,
-                        content: "You are a helpful assistant that analyzes conversation transcripts and helps users understand them better."
+                        content: "You are a helpful assistant that analyzes conversation transcripts and helps users understand them better. You support label changes, there is a possiblity that the user will change the labels of the speakers and you must adapt tot it in the converstaion from that point."
                     },
                     {
                         role: "user" as const,
-                        content: `Here are my notes: ${JSON.stringify(noteResults, null, 2)}. Please help me analyze them. Respond with minimal text initially until asked for more.`
+                        content: `Here are my notes: ${JSON.stringify(noteResults, null, 2)}. Please help me analyze them. Respond with a minimal greetingn initially, then ask for prompts.`
                     }
                 ];
                 

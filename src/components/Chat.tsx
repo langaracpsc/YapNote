@@ -60,7 +60,7 @@ export default function Chat({ noteId, results, show }: { noteId: string, result
 
     useEffect(() => {
         initChat();
-    }, [noteId])
+    }, [noteId, results])
 
     return (
         show && (
@@ -71,7 +71,7 @@ export default function Chat({ noteId, results, show }: { noteId: string, result
                 <AlertDialogContent className="max-w-[90vw] max-h-[90vh]">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Chat</AlertDialogTitle>
-                        <div className="mt-4 h-[500px] flex flex-col rounded-lg border border-border">
+                        <div className="mt-4 h-[700px] flex flex-col rounded-lg border border-border">
                             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {messages.map((message, index) => (
                                     <div
